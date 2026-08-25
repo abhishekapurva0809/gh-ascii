@@ -43,7 +43,7 @@ export const profileConfig: ProfileConfig = {
     uptime: "auto", // Automatically calculated from GitHub account creation date
     host: "Developer Workstation",
     kernel: "NT 10.0",
-    ide: "VS Code / Cursor",
+    ide: "VS Code / Cursor / Google Antigravity",
   },
   languages: {
     programming: ["TypeScript", "JavaScript", "Python", "C++"],
