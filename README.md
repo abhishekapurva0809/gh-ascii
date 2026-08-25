@@ -1,123 +1,232 @@
-# gh-ascii
+# gh-ascii — Custom GitHub Profile Card
 
-Turn any GitHub handle into a neofetch-style ASCII profile card (SVG) for your
-profile README — fully automatic. The avatar is converted to ASCII art and the
-stats (uptime, languages, repos, stars, commits, followers, contact info) are
-pulled live from the GitHub API.
+> A customized fork of [`gh-ascii`](https://github.com/crafter-station/gh-ascii) for creating a terminal-style GitHub profile card with ASCII art, dynamic GitHub statistics, and personalized profile information.
 
-Inspired by [Andrew6rant's profile README](https://github.com/Andrew6rant/Andrew6rant/tree/main),
-but with zero manual setup: just a handle.
+![GitHub Profile Card](./dark_mode.svg)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/example-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="assets/example-light.svg" />
-  <img alt="gh-ascii card for torvalds — ASCII portrait next to live GitHub stats" src="assets/example-dark.svg" />
-</picture>
+---
 
-<sub>`torvalds`, generated fully automatically — avatar → ASCII, stats via the GitHub API.</sub>
+## ✨ Features
 
-## Usage
+* 🖼️ GitHub avatar converted into ASCII art
+* 📊 Dynamic GitHub statistics
+* 📦 Repository count
+* ⭐ Stars
+* 👥 Followers
+* 💻 Programming languages
+* 🧑‍💻 Custom developer information
+* 🖥️ Environment information such as OS, IDE, and kernel
+* 🎮 Custom hobbies and interests
+* 📫 Contact and social links
+* 🌙 Dark mode support
+* ☀️ Light mode support
+* ⚡ SVG-based output
+* 🤖 Automatic profile card updates using GitHub Actions
 
-No hosting required — the SVGs live in your own repo:
+---
 
-1. Open the generator UI at `/`, type your handle, and download
-   `dark_mode.svg` + `light_mode.svg`.
-2. Commit both files to your profile repo (`github.com/<you>/<you>`), next to
-   the README.
-3. Paste this into `README.md`:
+## 🖥️ Profile Card
 
-```html
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="dark_mode.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="light_mode.svg" />
-  <img alt="my GitHub profile" src="dark_mode.svg" />
-</picture>
-```
-
-### Agent mode — let your AI do it
-
-Copy this into Claude Code, Cursor, or any coding agent (replace `<handle>`
-and `<gh-ascii-url>`; the generator UI produces a pre-filled version):
+The generated card is designed in a terminal/neofetch-inspired style.
 
 ```text
-Add a gh-ascii ASCII profile card to my GitHub profile README.
-
-Context:
-- My GitHub handle: <handle>
-- My profile README lives in the repo <handle>/<handle>. If it doesn't
-  exist, create it as a public repo with a README.
-- Card generator: <gh-ascii-url>/<handle>?theme=dark|light returns an SVG.
-
-Steps:
-1. Clone github.com/<handle>/<handle> and download both themes into its root:
-   curl -fL "<gh-ascii-url>/<handle>?theme=dark" -o dark_mode.svg
-   curl -fL "<gh-ascii-url>/<handle>?theme=light" -o light_mode.svg
-2. Render or open both SVGs and look at them before committing.
-3. Insert this at the top of README.md, keeping all existing content:
-   <picture>
-     <source media="(prefers-color-scheme: dark)" srcset="dark_mode.svg" />
-     <source media="(prefers-color-scheme: light)" srcset="light_mode.svg" />
-     <img alt="<handle>'s GitHub profile" src="dark_mode.svg" />
-   </picture>
-   If the light card reads poorly against white, use a plain
-   <img src="dark_mode.svg" width="100%" /> instead of <picture> — the dark
-   card carries its own background.
-4. Commit both SVGs + the README change ("feat: add gh-ascii profile card")
-   and push.
-5. Confirm it renders at github.com/<handle>.
+┌───────────────────────────────────────────────────────────────┐
+│                                                               │
+│   ASCII ART             ── username@github ────────────────  │
+│                         OS:          Windows                  │
+│                         IDE:         VS Code                  │
+│                         Host:        Personal Computer        │
+│                                                               │
+│                         ── Languages ─────────────────────── │
+│                         Programming: C++, JavaScript, Python  │
+│                         Web:         HTML, CSS, React         │
+│                                                               │
+│                         ── Contact ───────────────────────── │
+│                         GitHub:      username                 │
+│                         LinkedIn:    profile                  │
+│                                                               │
+│                         ── GitHub Stats ──────────────────── │
+│                         Repositories: ...                     │
+│                         Commits:      ...                     │
+│                         Stars:        ...                     │
+│                         Followers:    ...                     │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
 ```
 
-API (used by the UI, or embed directly if you host a deployment):
+---
 
-- `GET /<handle>` — returns the SVG card (`?theme=dark` default, `?theme=light`)
-- `?cols=40..160` — ASCII resolution (default 100); higher = more detail, bigger card
+## 🚀 Getting Started
 
-## How the ASCII rendering works
+### 1. Clone the repository
 
-Techniques borrowed from the best open-source converters (chafa, AAlib,
-Acerola's ASCII shader, jp2a):
+```bash
+git clone https://github.com/abhishekapurva0809/gh-ascii.git
+cd gh-ascii
+```
 
-- **ML background removal** (ONNX portrait matting) isolates the subject.
-- **Measured glyph metrics** — `scripts/calibrate-glyphs.html` renders every
-  printable ASCII glyph in the card's actual font stack and measures its real
-  ink coverage per cell quadrant (baked into `lib/glyphs.ts`). In Menlo, `N`
-  is denser than `@` — hand-written ramps get this wrong.
-- **AAlib-style structure matching** — each cell is sampled as 2x2 quadrants
-  and matched against glyph quadrant coverage, so corners, stems and
-  diagonals pick shape-appropriate glyphs.
-- **Chafa-style fill/structure split** — flat cells walk a stable measured
-  density ramp instead, so smooth areas don't turn into letter salad.
-- **Acerola-style edge voting** — Sobel directions per subcell; a `/ \ | -`
-  contour glyph overrides only when 3 of 4 subcells agree on direction.
-- Adaptive unsharp, percentile normalization, damped Floyd–Steinberg on the
-  density residual, and bimodal (line-art) detection round out the pipeline.
-
-## Development
+### 2. Install dependencies
 
 ```bash
 bun install
+```
+
+### 3. Run the project
+
+```bash
 bun run dev
 ```
 
-Optional: set `GITHUB_TOKEN` to raise the GitHub API rate limits (unauthenticated
-is 60 requests/hour; commit counts come from the commit-search API and degrade
-gracefully when rate-limited).
+Follow the project's existing commands and configuration for generating the profile SVG.
 
-Responses are cached for an hour (`Cache-Control` + fetch revalidation), so
-cards stay fresh without hammering the API.
+---
 
-## Credits
+## ⚙️ Configuration
 
-This project is inspired by
-[**Andrew6rant/Andrew6rant**](https://github.com/Andrew6rant/Andrew6rant/tree/main) —
-Andrew Grant's hand-crafted neofetch-style profile README (self-updating ASCII
-portrait + live stats SVG) that set the visual bar. gh-ascii automates that
-idea for any GitHub handle.
+Personal information can be customized without changing the core GitHub API functionality.
 
-Rendering techniques were adapted from the open-source ASCII ecosystem:
-[chafa](https://github.com/hpjansson/chafa) (fill/structure symbol split),
-[AAlib](https://aa-project.sourceforge.net/aalib/) (subcell brightness matching),
-[Acerola's ASCII shader](https://github.com/GarrettGunnell/AcerolaFX) (edge
-direction voting), and [jp2a](https://github.com/Talinx/jp2a) (directional
-edge glyphs).
-# gh-ascii
+You can configure information such as:
+
+```text
+OS
+Uptime
+Host
+Kernel
+IDE
+
+Programming Languages
+Web Technologies
+Tools
+Real Languages
+
+Hobbies
+Email
+Website
+GitHub
+LinkedIn
+Discord
+```
+
+GitHub-related information should remain dynamic and be retrieved from GitHub rather than being manually hardcoded.
+
+---
+
+## 📊 Dynamic GitHub Statistics
+
+GitHub statistics are generated from GitHub data.
+
+Examples include:
+
+* Repositories
+* Commits
+* Stars
+* Followers
+* Following
+* Contributions
+* Languages
+
+This means you don't need to manually update your GitHub statistics whenever your profile changes.
+
+For example:
+
+```text
+Before:
+
+Commits: 120
+
+        ↓ New GitHub activity
+
+After:
+
+Commits: 135
+```
+
+---
+
+## 🤖 Automatic Updates
+
+This customized version can use GitHub Actions to regenerate the profile card automatically.
+
+The workflow can:
+
+1. Fetch the latest GitHub information.
+2. Run the profile card generator.
+3. Generate the updated SVG.
+4. Compare it with the previous version.
+5. Commit changes only when the generated card changes.
+6. Push the updated SVG to the profile repository.
+
+The workflow can also be triggered manually using `workflow_dispatch`.
+
+---
+
+## 🧩 Using It on Your GitHub Profile
+
+Place the generated SVG files in your GitHub profile repository.
+
+For example:
+
+```text
+your-username/
+└── your-username/
+    ├── README.md
+    ├── dark_mode.svg
+    └── light_mode.svg
+```
+
+Then add the card to your `README.md`:
+
+```html
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./dark_mode.svg">
+  <source media="(prefers-color-scheme: light)" srcset="./light_mode.svg">
+  <img alt="GitHub Profile Card" src="./dark_mode.svg">
+</picture>
+```
+
+---
+
+## 🛠️ Tech Stack
+
+* TypeScript
+* Bun
+* GitHub API
+* SVG
+* GitHub Actions
+* ASCII rendering
+
+---
+
+## 🎨 Customization
+
+This project is based on the original `gh-ascii` project and has been customized to provide more control over the generated profile card.
+
+The goal is to keep the original functionality while providing a more personalized developer-profile experience.
+
+---
+
+## 🙏 Credits
+
+This project is a customized fork of:
+
+**[crafter-station/gh-ascii](https://github.com/crafter-station/gh-ascii)**
+
+Original project by **crafter-station**.
+
+All original functionality and ideas belong to their respective authors.
+
+This fork focuses on extending the design, customization, and automatic GitHub profile integration.
+
+---
+
+## 📄 License
+
+See the original project's license and repository files for licensing information.
+
+---
+
+## ⭐ About
+
+A personalized GitHub profile card generator combining **ASCII art + GitHub statistics + developer information** in a terminal-inspired SVG.
+
+Built and customized by **Abhishek Apurva**.
