@@ -64,8 +64,7 @@ jobs:
           PROFILE_REPO_PAT: ${{ secrets.PROFILE_REPO_PAT }}
         run: |
           if [ -z "$PROFILE_REPO_PAT" ]; then
-            echo "⚠️ Secret PROFILE_REPO_PAT is not set in gh-ascii repository settings."
-            echo "ℹ️ To automatically update abhishekapurva0809/abhishekapurva0809, add PROFILE_REPO_PAT to gh-ascii repository secrets."
+            echo "⚠️ PROFILE_REPO_PAT is not configured."
             exit 0
           fi
 
@@ -73,6 +72,7 @@ jobs:
           cp light_mode.svg profile_repo/light_mode.svg
 
           cd profile_repo
+
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
@@ -80,25 +80,10 @@ jobs:
             git add dark_mode.svg light_mode.svg
             git commit -m "ci: update profile card SVGs from gh-ascii [skip ci]"
 
-            # Create temporary GIT_ASKPASS helper script for in-memory git prompt authentication
-            ASKPASS_PATH=$(mktemp)
-            cat << 'EOF' > "$ASKPASS_PATH"
-#!/bin/sh
-case "$1" in
-  *Username*|*username*) echo "x-access-token" ;;
-  *) echo "$PROFILE_REPO_PAT" ;;
-esac
-EOF
-            chmod +x "$ASKPASS_PATH"
+            AUTH_HEADER=$(printf 'x-access-token:%s' "$PROFILE_REPO_PAT" | base64 -w 0)
+            git -c http.extraheader="AUTHORIZATION: basic $AUTH_HEADER" push origin HEAD:main
 
-            # Trap cleanup so the askpass helper is deleted even if push fails
-            trap 'rm -f "$ASKPASS_PATH"' EXIT
-
-            GIT_ASKPASS="$ASKPASS_PATH" GIT_TERMINAL_PROMPT=0 git push origin HEAD:main
-
-            unset PROFILE_REPO_PAT
-
-            echo "🎉 Successfully updated SVGs in profile repository (abhishekapurva0809/abhishekapurva0809)!"
+            echo "✅ Successfully updated profile repository."
           else
-            echo "ℹ️ No changes detected in profile repository SVGs. Skipping commit."
+            echo "ℹ️ No changes detected. Skipping commit."
           fi
