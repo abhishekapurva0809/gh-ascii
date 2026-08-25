@@ -52,7 +52,6 @@ jobs:
           fi
 
       - name: Checkout profile repository (abhishekapurva0809/abhishekapurva0809)
-        if: ${{ secrets.PROFILE_REPO_PAT != '' }}
         uses: actions/checkout@v4
         with:
           repository: abhishekapurva0809/abhishekapurva0809
@@ -61,10 +60,15 @@ jobs:
           persist-credentials: false
 
       - name: Update profile repository
-        if: ${{ secrets.PROFILE_REPO_PAT != '' }}
         env:
           PROFILE_REPO_PAT: ${{ secrets.PROFILE_REPO_PAT }}
         run: |
+          if [ -z "$PROFILE_REPO_PAT" ]; then
+            echo "⚠️ Secret PROFILE_REPO_PAT is not set in gh-ascii repository settings."
+            echo "ℹ️ To automatically update abhishekapurva0809/abhishekapurva0809, add PROFILE_REPO_PAT to gh-ascii repository secrets."
+            exit 0
+          fi
+
           cp dark_mode.svg profile_repo/dark_mode.svg
           cp light_mode.svg profile_repo/light_mode.svg
 
@@ -80,7 +84,10 @@ jobs:
             ASKPASS_PATH=$(mktemp)
             cat << 'EOF' > "$ASKPASS_PATH"
 #!/bin/sh
-echo "$PROFILE_REPO_PAT"
+case "$1" in
+  *Username*|*username*) echo "x-access-token" ;;
+  *) echo "$PROFILE_REPO_PAT" ;;
+esac
 EOF
             chmod +x "$ASKPASS_PATH"
 
