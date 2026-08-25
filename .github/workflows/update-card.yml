@@ -51,19 +51,20 @@ jobs:
             echo "ℹ️ No changes detected in dark_mode.svg or light_mode.svg for gh-ascii. Skipping commit."
           fi
 
-      - name: Update profile repository (abhishekapurva0809/abhishekapurva0809)
+      - name: Checkout profile repository (abhishekapurva0809/abhishekapurva0809)
+        if: ${{ secrets.PROFILE_REPO_PAT != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: abhishekapurva0809/abhishekapurva0809
+          token: ${{ secrets.PROFILE_REPO_PAT }}
+          path: profile_repo
+          persist-credentials: false
+
+      - name: Update profile repository
+        if: ${{ secrets.PROFILE_REPO_PAT != '' }}
         env:
-          PROFILE_PAT: ${{ secrets.PROFILE_REPO_PAT }}
+          PROFILE_REPO_PAT: ${{ secrets.PROFILE_REPO_PAT }}
         run: |
-          if [ -z "$PROFILE_PAT" ]; then
-            echo "⚠️ Secret PROFILE_REPO_PAT is not set in gh-ascii repository settings."
-            echo "ℹ️ To automatically update abhishekapurva0809/abhishekapurva0809, add PROFILE_REPO_PAT to gh-ascii repository secrets."
-            exit 0
-          fi
-
-          echo "🚀 Cloning profile repository abhishekapurva0809/abhishekapurva0809..."
-          git clone https://x-access-token:${PROFILE_PAT}@github.com/abhishekapurva0809/abhishekapurva0809.git profile_repo
-
           cp dark_mode.svg profile_repo/dark_mode.svg
           cp light_mode.svg profile_repo/light_mode.svg
 
@@ -74,7 +75,22 @@ jobs:
           if [ -n "$(git status --porcelain dark_mode.svg light_mode.svg)" ]; then
             git add dark_mode.svg light_mode.svg
             git commit -m "ci: update profile card SVGs from gh-ascii [skip ci]"
-            git push
+
+            # Create temporary GIT_ASKPASS helper script for in-memory git prompt authentication
+            ASKPASS_PATH=$(mktemp)
+            cat << 'EOF' > "$ASKPASS_PATH"
+#!/bin/sh
+echo "$PROFILE_REPO_PAT"
+EOF
+            chmod +x "$ASKPASS_PATH"
+
+            # Trap cleanup so the askpass helper is deleted even if push fails
+            trap 'rm -f "$ASKPASS_PATH"' EXIT
+
+            GIT_ASKPASS="$ASKPASS_PATH" GIT_TERMINAL_PROMPT=0 git push origin HEAD:main
+
+            unset PROFILE_REPO_PAT
+
             echo "🎉 Successfully updated SVGs in profile repository (abhishekapurva0809/abhishekapurva0809)!"
           else
             echo "ℹ️ No changes detected in profile repository SVGs. Skipping commit."
