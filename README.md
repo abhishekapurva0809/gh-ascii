@@ -1,186 +1,150 @@
-# gh-ascii — Custom GitHub Profile Card
+# gh-ascii — Customized Terminal/Neofetch GitHub Profile Card
 
-> A customized fork of [`gh-ascii`](https://github.com/crafter-station/gh-ascii) for creating a terminal-style GitHub profile card with ASCII art, dynamic GitHub statistics, and personalized profile information.
+> A customized fork of [`gh-ascii`](https://github.com/crafter-station/gh-ascii) designed for creating a professional, terminal/neofetch-style GitHub profile card with ASCII avatar art, dynamic GitHub API statistics, customizable developer environment details, and automated GitHub Actions updates.
 
-![GitHub Profile Card](./dark_mode.svg)
+![GitHub Profile Card Dark](./dark_mode.svg)
 
 ---
 
 ## ✨ Features
 
-* 🖼️ GitHub avatar converted into ASCII art
-* 📊 Dynamic GitHub statistics
-* 📦 Repository count
-* ⭐ Stars
-* 👥 Followers
-* 💻 Programming languages
-* 🧑‍💻 Custom developer information
-* 🖥️ Environment information such as OS, IDE, and kernel
-* 🎮 Custom hobbies and interests
-* 📫 Contact and social links
-* 🌙 Dark mode support
-* ☀️ Light mode support
-* ⚡ SVG-based output
-* 🤖 Automatic profile card updates using GitHub Actions
+* 🖼️ **ASCII Avatar Art**: GitHub profile avatar automatically converted to ASCII art with detail level control.
+* 📊 **Dynamic GitHub API Statistics**: Repositories, Commits, Stars, Followers, Following, and Top Languages fetched live from GitHub.
+* 🖥️ **Customizable Environment Section**: Configurable OS, Host, Kernel, IDE, and dynamic/custom account Uptime.
+* 💻 **Categorized Languages Section**: Programming languages, Web technologies, Developer tools, and Spoken languages.
+* 🎮 **Hobbies Section**: Categorized Software and Hardware interests.
+* 📫 **Contact & Social Links**: Email, Website, GitHub, LinkedIn, and Discord.
+* ⚙️ **Single Configuration File**: Centralized `profile.config.ts` for all personal profile information.
+* ⚡ **CLI Generator**: Standalone offline SVG generator (`bun run generate`).
+* 🌙 **Dark & Light Mode**: Generates both `dark_mode.svg` and `light_mode.svg`.
+* 🤖 **Automated Updates**: Scheduled GitHub Actions workflow updating SVGs every 6 hours and on manual trigger (`workflow_dispatch`).
 
 ---
 
-## 🖥️ Profile Card
+## 🖥️ Profile Card Structure
 
-The generated card is designed in a terminal/neofetch-inspired style.
+The SVG card is generated in a clean terminal monospace format:
 
 ```text
-┌───────────────────────────────────────────────────────────────┐
-│                                                               │
-│   ASCII ART             ── username@github ────────────────  │
-│                         OS:          Windows                  │
-│                         IDE:         VS Code                  │
-│                         Host:        Personal Computer        │
-│                                                               │
-│                         ── Languages ─────────────────────── │
-│                         Programming: C++, JavaScript, Python  │
-│                         Web:         HTML, CSS, React         │
-│                                                               │
-│                         ── Contact ───────────────────────── │
-│                         GitHub:      username                 │
-│                         LinkedIn:    profile                  │
-│                                                               │
-│                         ── GitHub Stats ──────────────────── │
-│                         Repositories: ...                     │
-│                         Commits:      ...                     │
-│                         Stars:        ...                     │
-│                         Followers:    ...                     │
-│                                                               │
-└───────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   ASCII ART             ── username@github ──────────────────────────────   │
+│                         . OS: ...................... Windows 11 / Linux     │
+│                         . Uptime: .................. 3 years, 2 months      │
+│                         . Host: .................... Developer Workstation  │
+│                         . Kernel: .................. NT 10.0 / 6.x          │
+│                         . IDE: ..................... VS Code / Cursor       │
+│                                                                             │
+│                         ── Languages ────────────────────────────────────   │
+│                         . Languages.Programming: ... TypeScript, Python...  │
+│                         . Languages.Web: ........... React, Next.js, HTML   │
+│                         . Languages.Tools: ......... Git, Bun, Docker       │
+│                         . Languages.Real: .......... English, Hindi         │
+│                                                                             │
+│                         ── Hobbies ──────────────────────────────────────   │
+│                         . Hobbies.Software: ........ Open Source, Web Dev   │
+│                         . Hobbies.Hardware: ........ PC Building, Gadgets   │
+│                                                                             │
+│                         ── Contact ──────────────────────────────────────   │
+│                         . Email: ................... email@example.com      │
+│                         . Website: ................. https://yourwebsite.com│
+│                         . GitHub: .................. github.com/username    │
+│                         . LinkedIn: ................ linkedin.com/in/user   │
+│                         . Discord: ................. username               │
+│                                                                             │
+│                         ── GitHub Statistics ────────────────────────────   │
+│                         . Repositories: ........ 45 | . Stars: ........ 120 │
+│                         . Commits: ............ 850 | . Followers: .... 230 │
+│                         . Following: .───────── 150 | . Top Lang: ── TypeScript│
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Getting Started
+## ⚙️ Configuration (`profile.config.ts`)
 
-### 1. Clone the repository
+All personal details are managed in one central file: [`profile.config.ts`](./profile.config.ts).
 
-```bash
-git clone https://github.com/abhishekapurva0809/gh-ascii.git
-cd gh-ascii
+```typescript
+export const profileConfig: ProfileConfig = {
+  username: "abhishekapurva0809",
+  env: {
+    os: "Windows 11 / Linux",
+    uptime: "auto", // "auto" calculates account uptime dynamically from GitHub creation date
+    host: "Developer Workstation",
+    kernel: "NT 10.0 / 6.x",
+    ide: "VS Code / Cursor",
+  },
+  languages: {
+    programming: ["TypeScript", "JavaScript", "Python", "C++"],
+    web: ["React", "Next.js", "Tailwind CSS", "HTML/CSS"],
+    tools: ["Git", "Bun", "Node.js", "Docker"],
+    real: ["English", "Hindi"],
+  },
+  hobbies: {
+    software: ["Open Source", "Web Development", "AI Agents"],
+    hardware: ["PC Building", "Gadgets"],
+  },
+  contact: {
+    email: "abhishekapurva0809@gmail.com",
+    website: "https://github.com/abhishekapurva0809",
+    github: "github.com/abhishekapurva0809",
+    linkedin: "linkedin.com/in/abhishekapurva0809",
+    discord: "abhishekapurva",
+  },
+};
 ```
 
-### 2. Install dependencies
+---
 
+## 🚀 Local Usage
+
+### 1. Install dependencies
 ```bash
 bun install
 ```
 
-### 3. Run the project
+### 2. Generate Profile Cards locally
+```bash
+bun run generate
+```
+This produces `dark_mode.svg` and `light_mode.svg` in the project root directory.
 
+### 3. Run Development Web Server
 ```bash
 bun run dev
 ```
-
-Follow the project's existing commands and configuration for generating the profile SVG.
-
----
-
-## ⚙️ Configuration
-
-Personal information can be customized without changing the core GitHub API functionality.
-
-You can configure information such as:
-
-```text
-OS
-Uptime
-Host
-Kernel
-IDE
-
-Programming Languages
-Web Technologies
-Tools
-Real Languages
-
-Hobbies
-Email
-Website
-GitHub
-LinkedIn
-Discord
-```
-
-GitHub-related information should remain dynamic and be retrieved from GitHub rather than being manually hardcoded.
+Open `http://localhost:3000` or visit `http://localhost:3000/abhishekapurva0809?theme=dark`.
 
 ---
 
-## 📊 Dynamic GitHub Statistics
+## 🤖 GitHub Actions Automatic Updates
 
-GitHub statistics are generated from GitHub data.
+The workflow [`.github/workflows/update-card.yml`](./.github/workflows/update-card.yml) runs every **6 hours** and on manual trigger (`workflow_dispatch`).
 
-Examples include:
+### Dual-Repository Setup:
+1. **Generator Repo**: `abhishekapurva0809/gh-ascii` (runs workflow, generates SVGs).
+2. **Profile Repo**: `abhishekapurva0809/abhishekapurva0809` (hosts profile `README.md`).
 
-* Repositories
-* Commits
-* Stars
-* Followers
-* Following
-* Contributions
-* Languages
+### Cross-Repo Authentication (Optional but Recommended):
+1. Create a GitHub Personal Access Token (PAT) with `repo` (`Contents: Read & write`) access for `abhishekapurva0809/abhishekapurva0809`.
+2. Go to **gh-ascii** -> **Settings** -> **Secrets and variables** -> **Actions**.
+3. Add a Repository Secret named **`PROFILE_REPO_PAT`**.
 
-This means you don't need to manually update your GitHub statistics whenever your profile changes.
-
-For example:
-
-```text
-Before:
-
-Commits: 120
-
-        ↓ New GitHub activity
-
-After:
-
-Commits: 135
-```
+When `PROFILE_REPO_PAT` is configured, the workflow automatically commits updated `dark_mode.svg` and `light_mode.svg` files directly to your profile README repository **only when statistics or avatar content change**.
 
 ---
 
-## 🤖 Automatic Updates
+## 🧩 Embedding in GitHub Profile README
 
-This customized version can use GitHub Actions to regenerate the profile card automatically.
-
-The workflow can:
-
-1. Fetch the latest GitHub information.
-2. Run the profile card generator.
-3. Generate the updated SVG.
-4. Compare it with the previous version.
-5. Commit changes only when the generated card changes.
-6. Push the updated SVG to the profile repository.
-
-The workflow can also be triggered manually using `workflow_dispatch`.
-
----
-
-## 🧩 Using It on Your GitHub Profile
-
-Place the generated SVG files in your GitHub profile repository.
-
-For example:
-
-```text
-your-username/
-└── your-username/
-    ├── README.md
-    ├── dark_mode.svg
-    └── light_mode.svg
-```
-
-Then add the card to your `README.md`:
+Add this `<picture>` block to the top of your `README.md` inside your profile repository (`abhishekapurva0809/abhishekapurva0809`):
 
 ```html
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./dark_mode.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./light_mode.svg">
-  <img alt="GitHub Profile Card" src="./dark_mode.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./dark_mode.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="./light_mode.svg" />
+  <img alt="Abhishek Apurva's GitHub Profile Card" src="./dark_mode.svg" />
 </picture>
 ```
 
@@ -188,45 +152,14 @@ Then add the card to your `README.md`:
 
 ## 🛠️ Tech Stack
 
-* TypeScript
-* Bun
-* GitHub API
-* SVG
-* GitHub Actions
-* ASCII rendering
-
----
-
-## 🎨 Customization
-
-This project is based on the original `gh-ascii` project and has been customized to provide more control over the generated profile card.
-
-The goal is to keep the original functionality while providing a more personalized developer-profile experience.
+* **TypeScript & Bun**
+* **GitHub REST API** (`/users/{login}`, `/users/{login}/repos`, `/search/commits`)
+* **Jimp & ONNX Background Removal** (`@imgly/background-removal-node`)
+* **SVG & Monospace Typography**
+* **GitHub Actions** (`oven-sh/setup-bun`, `actions/checkout`)
 
 ---
 
 ## 🙏 Credits
 
-This project is a customized fork of:
-
-**[crafter-station/gh-ascii](https://github.com/crafter-station/gh-ascii)**
-
-Original project by **crafter-station**.
-
-All original functionality and ideas belong to their respective authors.
-
-This fork focuses on extending the design, customization, and automatic GitHub profile integration.
-
----
-
-## 📄 License
-
-See the original project's license and repository files for licensing information.
-
----
-
-## ⭐ About
-
-A personalized GitHub profile card generator combining **ASCII art + GitHub statistics + developer information** in a terminal-inspired SVG.
-
-Built and customized by **Abhishek Apurva**.
+Based on original [`crafter-station/gh-ascii`](https://github.com/crafter-station/gh-ascii). Extended with neofetch profile sections, single configuration file, standalone CLI generation, and automated dual-repo GitHub Actions integration.

@@ -11,6 +11,7 @@ export interface GitHubStats {
   email: string | null;
   twitter: string | null;
   followers: number;
+  following: number;
   publicRepos: number;
   stars: number;
   languages: string[];
@@ -73,6 +74,28 @@ export async function fetchStats(login: string): Promise<GitHubStats> {
   });
   if (userRes.status === 404) throw new GitHubUserNotFound(login);
   if (!userRes.ok) {
+    if (userRes.status === 403) {
+      console.warn(
+        `⚠️ GitHub API rate limit reached for unauthenticated request. Using fallback stats for @${login}. Set GITHUB_TOKEN environment variable to avoid rate limits.`
+      );
+      return {
+        login,
+        name: login,
+        avatarUrl: `https://github.com/${login}.png`,
+        createdAt: new Date().toISOString(),
+        location: null,
+        company: null,
+        blog: null,
+        email: null,
+        twitter: null,
+        followers: 0,
+        following: 0,
+        publicRepos: 0,
+        stars: 0,
+        languages: ["TypeScript", "JavaScript"],
+        commits: null,
+      };
+    }
     throw new Error(`GitHub API error: ${userRes.status} ${await userRes.text()}`);
   }
   const user = await userRes.json();
@@ -105,6 +128,7 @@ export async function fetchStats(login: string): Promise<GitHubStats> {
     email: user.email || null,
     twitter: user.twitter_username || null,
     followers: user.followers,
+    following: typeof user.following === "number" ? user.following : 0,
     publicRepos: user.public_repos,
     stars,
     languages,

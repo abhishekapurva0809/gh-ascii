@@ -2,14 +2,19 @@ import type { NextRequest } from "next/server";
 import { fetchStats, GitHubUserNotFound } from "@/lib/github";
 import { avatarToAscii, type Theme } from "@/lib/ascii";
 import { renderSvg } from "@/lib/svg";
+import { profileConfig } from "@/profile.config";
 
 const VALID_LOGIN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
 
+interface RouteParams {
+  params: Promise<{ user: string }>;
+}
+
 export async function GET(
   request: NextRequest,
-  ctx: RouteContext<"/[user]">
+  { params }: RouteParams
 ) {
-  const { user } = await ctx.params;
+  const { user } = await params;
   const searchParams = request.nextUrl.searchParams;
   const theme: Theme = searchParams.get("theme") === "light" ? "light" : "dark";
   const cols = Math.min(
@@ -24,7 +29,11 @@ export async function GET(
   try {
     const stats = await fetchStats(user);
     const ascii = await avatarToAscii(stats.avatarUrl, theme, cols);
-    const svg = renderSvg(stats, ascii, theme);
+    const cfg =
+      user.toLowerCase() === profileConfig.username.toLowerCase()
+        ? profileConfig
+        : { ...profileConfig, username: user };
+    const svg = renderSvg(stats, ascii, theme, cfg);
 
     return new Response(svg, {
       headers: {

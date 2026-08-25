@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate": "npx tsx scripts/generate-card.ts"
   },
   "dependencies": {
     "@imgly/background-removal-node": "^1.4.5",
