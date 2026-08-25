@@ -1,9 +1,9 @@
-name: Generate Profile Card
+name: Generate and Update GitHub Profile Card
 
 on:
   schedule:
-    # Run every 6 hours
-    - cron: '0 */6 * * *'
+    # Run automatically every 6 hours at minute 17
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -12,60 +12,70 @@ permissions:
 jobs:
   generate-and-update:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout gh-ascii repository
+      - name: Checkout gh-ascii generator repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: '20'
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile || bun install
+        run: npm ci || npm install
 
-      - name: Generate updated SVGs
+      - name: Generate updated profile card SVGs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun run generate
+        run: npm run generate
 
-      - name: Commit and push SVGs to gh-ascii repository
+      - name: Verify generated SVGs
         run: |
-          git config --local user.email "action@github.com"
+          if [ ! -f dark_mode.svg ] || [ ! -f light_mode.svg ]; then
+            echo "❌ Error: SVG files dark_mode.svg and light_mode.svg were not generated!"
+            exit 1
+          fi
+          echo "✅ Successfully verified dark_mode.svg and light_mode.svg exist."
+
+      - name: Commit and push SVGs to gh-ascii generator repository
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           if [ -n "$(git status --porcelain dark_mode.svg light_mode.svg)" ]; then
             git add dark_mode.svg light_mode.svg
-            git commit -m "ci: update generated profile cards [skip ci]"
+            git commit -m "ci: update generated profile card SVGs [skip ci]"
             git push
-            echo "Updated profile cards pushed to gh-ascii repository."
+            echo "✅ Updated profile card SVGs pushed to gh-ascii repository."
           else
-            echo "No changes in generated SVGs. Skipping commit for gh-ascii."
+            echo "ℹ️ No changes detected in dark_mode.svg or light_mode.svg for gh-ascii. Skipping commit."
           fi
 
-      - name: Update profile README repository (if PAT configured)
+      - name: Update profile repository (abhishekapurva0809/abhishekapurva0809)
         env:
           PROFILE_PAT: ${{ secrets.PROFILE_REPO_PAT }}
         run: |
           if [ -z "$PROFILE_PAT" ]; then
-            echo "PROFILE_REPO_PAT secret is not set. Skipping push to profile repository."
+            echo "⚠️ Secret PROFILE_REPO_PAT is not set in gh-ascii repository settings."
+            echo "ℹ️ To automatically update abhishekapurva0809/abhishekapurva0809, add PROFILE_REPO_PAT to gh-ascii repository secrets."
             exit 0
           fi
 
-          echo "Cloning profile repository abhishekapurva0809/abhishekapurva0809..."
-          git clone https://x-access-token:${PROFILE_PAT}@github.com/abhishekapurva0809/abhishekapurva0809.git target_profile_repo
-          
-          cp dark_mode.svg target_profile_repo/dark_mode.svg
-          cp light_mode.svg target_profile_repo/light_mode.svg
+          echo "🚀 Cloning profile repository abhishekapurva0809/abhishekapurva0809..."
+          git clone https://x-access-token:${PROFILE_PAT}@github.com/abhishekapurva0809/abhishekapurva0809.git profile_repo
 
-          cd target_profile_repo
-          git config --local user.email "action@github.com"
+          cp dark_mode.svg profile_repo/dark_mode.svg
+          cp light_mode.svg profile_repo/light_mode.svg
+
+          cd profile_repo
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
           if [ -n "$(git status --porcelain dark_mode.svg light_mode.svg)" ]; then
             git add dark_mode.svg light_mode.svg
             git commit -m "ci: update profile card SVGs from gh-ascii [skip ci]"
             git push
-            echo "Successfully updated SVGs in profile repository!"
+            echo "🎉 Successfully updated SVGs in profile repository (abhishekapurva0809/abhishekapurva0809)!"
           else
-            echo "No changes detected in profile repository SVGs. Skipping commit."
+            echo "ℹ️ No changes detected in profile repository SVGs. Skipping commit."
           fi
