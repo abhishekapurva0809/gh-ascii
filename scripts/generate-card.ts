@@ -11,7 +11,11 @@ async function main() {
 
   try {
     const stats = await fetchStats(username);
-    console.log(`✅ Fetched stats for @${stats.login} (${stats.publicRepos} repos, ${stats.stars} stars, ${stats.followers} followers, ${stats.following} following)`);
+    console.log(
+      `✅ Fetched stats for @${stats.login} (${stats.publicRepos} repos, ${stats.stars} stars, ${stats.commits} total commits, ${stats.followers} followers, ${stats.following} following${
+        stats.linesOfCode ? `, LOC: ${stats.linesOfCode.total} (+${stats.linesOfCode.additions}/-${stats.linesOfCode.deletions})` : ""
+      })`
+    );
 
     console.log(`🎨 Rendering ASCII avatar for dark theme...`);
     const darkAscii = await avatarToAscii(stats.avatarUrl, "dark", 100);

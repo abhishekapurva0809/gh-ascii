@@ -24,6 +24,8 @@ const PALETTES = {
     dots: "#484f58",
     value: "#c9d1d9",
     number: "#79c0ff",
+    additions: "#7ee787",
+    deletions: "#ff7b72",
   },
   light: {
     bg: "#ffffff",
@@ -35,6 +37,8 @@ const PALETTES = {
     dots: "#8c959f",
     value: "#24292f",
     number: "#0550ae",
+    additions: "#1a7f37",
+    deletions: "#cf222e",
   },
 } satisfies Record<Theme, Record<string, string>>;
 
@@ -67,6 +71,7 @@ function buildInfoLines(
     | { type: "header"; text: string }
     | { type: "kv"; key: string; value: string; valueColor?: string }
     | { type: "kv2"; k1: string; v1: string; k2: string; v2: string }
+    | { type: "loc"; key: string; total: number; additions: number; deletions: number }
     | { type: "blank" }
   > = [];
 
@@ -159,6 +164,16 @@ function buildInfoLines(
     });
   }
 
+  if (stats.linesOfCode) {
+    items.push({
+      type: "loc",
+      key: "Lines of Code on GitHub",
+      total: stats.linesOfCode.total,
+      additions: stats.linesOfCode.additions,
+      deletions: stats.linesOfCode.deletions,
+    });
+  }
+
   // Calculate required column width dynamically
   let maxNeeded = 60;
   for (const item of items) {
@@ -169,6 +184,9 @@ function buildInfoLines(
     } else if (item.type === "kv2") {
       const half = item.k1.length + item.v1.length + item.k2.length + item.v2.length + 14;
       maxNeeded = Math.max(maxNeeded, half);
+    } else if (item.type === "loc") {
+      const valStr = `${n(item.total)} ( ${n(item.additions)}++,  ${n(item.deletions)}-- )`;
+      maxNeeded = Math.max(maxNeeded, item.key.length + valStr.length + 8);
     }
   }
 
@@ -211,6 +229,24 @@ function buildInfoLines(
         ...part(item.k1, item.v1),
         { text: " | ", color: c.rule },
         ...part(item.k2, item.v2),
+      ]);
+    } else if (item.type === "loc") {
+      const prefix = `. ${item.key}: `;
+      const totalStr = n(item.total);
+      const addStr = `${n(item.additions)}++`;
+      const delStr = `${n(item.deletions)}--`;
+      // val layout: ` 56,139 ( 85,369++,  29,230-- )`
+      const valLen = 1 + totalStr.length + 3 + addStr.length + 3 + delStr.length + 2;
+      const dotCount = Math.max(2, infoCols - prefix.length - valLen);
+      lines.push([
+        { text: prefix, color: c.key },
+        { text: ".".repeat(dotCount), color: c.dots },
+        { text: ` ${totalStr} `, color: c.number },
+        { text: "( ", color: c.dots },
+        { text: addStr, color: c.additions },
+        { text: ",  ", color: c.dots },
+        { text: delStr, color: c.deletions },
+        { text: " )", color: c.dots },
       ]);
     }
   }

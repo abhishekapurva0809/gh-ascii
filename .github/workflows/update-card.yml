@@ -27,7 +27,7 @@ jobs:
 
       - name: Generate updated profile card SVGs
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PROFILE_REPO_PAT || secrets.GITHUB_TOKEN }}
         run: npm run generate
 
       - name: Verify generated SVGs
