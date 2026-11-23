@@ -23,7 +23,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm ci --onnxruntime-node-install-cuda=skip || npm install --onnxruntime-node-install-cuda=skip
 
       - name: Generate updated profile card SVGs
         env:
